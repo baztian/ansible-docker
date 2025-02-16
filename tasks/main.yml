@@ -1,6 +1,8 @@
 ---
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=3600
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
 - name: Install Docker dependencies
   apt:
     name: "{{ packages }}"
@@ -22,7 +24,7 @@
   changed_when: False
 - name: Add Docker apt repository
   apt_repository:
-    repo: deb [arch={{ ansible_architecture }} signed-by=/etc/apt/trusted.gpg.d/docker-keyring.gpg] https://download.docker.com/linux/ubuntu {{ distro.stdout }} stable
+    repo: deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker-keyring.gpg] https://download.docker.com/linux/ubuntu {{ distro.stdout }} stable
 - name: Install Docker
   apt:
     name: "{{ packages }}"
@@ -44,7 +46,7 @@
   lineinfile:
     path: ~/.bashrc
     regexp: '^alias dockstats='
-    line: "{% raw %}alias dockstats='docker stats --no-stream --format \"table {{.Name}}\t{{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\"'{% endraw %}" # noqa 206 no-tabs
+    line: "{% raw %}alias dockstats='docker stats --no-stream --format \"table {{.Name}}\t{{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\"'{% endraw %}" # noqa jinja\[spacing] no-tabs
   become: no
 - name: Download Docker Compose
   get_url:
@@ -57,3 +59,4 @@
     url: https://raw.githubusercontent.com/docker/compose/{{ docker_compose_version }}/contrib/completion/bash/docker-compose
     checksum: "sha1:{{ docker_compose_completion_sha1 }}"
     dest: /etc/bash_completion.d/docker-compose
+    mode: 644
